@@ -1,6 +1,4 @@
 import { create } from 'zustand';
-
-const url = 'https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc';
 const options = {
     method: 'GET',
     headers: {
@@ -11,8 +9,9 @@ const options = {
 
 const useStore = create((set) => ({
     movieList: [],
-    fetchingData: async () => {
-        const result = await fetch(url, options);
+    fetchingData: async (currentPage) => {
+        console.log(currentPage);
+        const result = await fetch(`https://api.themoviedb.org/3/movie/popular?language=en-US&page=${currentPage}`, options);
         const json = await result.json();
         set({ movieList: json.results });
     },

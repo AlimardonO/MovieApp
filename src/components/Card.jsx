@@ -1,17 +1,47 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { AiFillStar } from "react-icons/ai";
 import { Link } from "react-router-dom";
-import useStore from "../store/store";
+
+const options = {
+  method: 'GET',
+  headers: {
+    accept: 'application/json',
+    Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxMWRjMjdjYjA0NDJmNjI3OGYzOGE3YTE2ZmMxYmExNCIsInN1YiI6IjY0YTQyMzY5ZTlkYTY5MDBlNDBjM2VlNSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.3Vjf82atS12q4hbf5rHS07J5Vv_xAKnwyOrJz1-9Wh4'
+  }
+};
 
 const Card = () => {
-  const fetchingData = useStore(state => state.fetchingData);
-  const movies = useStore(state => state.movieList);
+  const [movie, setData] = useState([]);
+  const [isFetching, setIsFetching] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const fetchingData = () => {
+    if (isFetching) {
+      setCurrentPage(state => state + 1);
+      fetch(`https://api.themoviedb.org/3/movie/popular?language=en-US&page=${currentPage}`, options)
+        .then(async resp => await resp.json())
+        .then(data => setData([...movie, ...data.results]))
+        .finally(() => {
+          setIsFetching(false)
+        })
+    }
+  }
   useEffect(() => {
     fetchingData();
+  }, [isFetching]);
+  const scrollFunc = (e) => {
+    if (e.target.documentElement.scrollHeight - (window.innerHeight + e.target.documentElement.scrollTop) < 100) {
+      setIsFetching(true);
+    }
+  }
+  useEffect(() => {
+    document.addEventListener('scroll', scrollFunc)
+    return function () {
+      return document.removeEventListener('scroll', scrollFunc)
+    }
   }, []);
   return (
     <>
-      {movies.map((item) => (
+      {movie.map((item) => (
         <Link
           key={item.id}
           to={`/${item.id}`}
