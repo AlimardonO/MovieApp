@@ -13,31 +13,16 @@ const options = {
 
 const Card = () => {
   const [movie, setData] = useState([]);
-  const [isFetching, setIsFetching] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const fetchingData = () => {
-    if (isFetching) {
-      setCurrentPage(state => state + 1);
-      fetch(`https://api.themoviedb.org/3/movie/popular?language=en-US&page=${currentPage}`, options)
-        .then(async resp => await resp.json())
-        .then(data => setData([...movie, ...data.results]))
-        .finally(() => setIsFetching(false))
-    }
+    setCurrentPage(state => state + 1);
+    fetch(`https://api.themoviedb.org/3/movie/popular?language=en-US&page=${currentPage}`, options)
+      .then(async resp => await resp.json())
+      .then(data => setData([...movie, ...data.results]))
   }
   useEffect(() => {
     fetchingData();
-  }, [isFetching]);
-  // const scrollFunc = (e) => {
-  //   if (e.target.documentElement.scrollHeight - (window.innerHeight + e.target.documentElement.scrollTop) < 100) {
-  //     setIsFetching(false);
-  //   }
-  // }
-  // useEffect(() => {
-  //   document.addEventListener('scroll', scrollFunc)
-  //   return function () {
-  //     return document.removeEventListener('scroll', scrollFunc)
-  //   }
-  // }, []);
+  }, []);
   return (
     <>
       <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 py-10">
@@ -62,7 +47,7 @@ const Card = () => {
           </Link>
         ))}
       </section>
-      <Button variant="contained" fullWidth onClick={() => setIsFetching(true)}>Load More</Button>
+      <Button variant="contained" fullWidth onClick={() => fetchingData()}>Load More</Button>
     </>
   );
 };
